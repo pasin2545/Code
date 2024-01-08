@@ -1,0 +1,23 @@
+1.ติดตั้ง ultralytics ด้วย pip install ultralytics
+2.ติดตั้ง torch ด้วย pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+3.เช็คการทำงานของ cuda คำสั่ง python
+4.import ultralytics
+5.import torch
+6.ใช้คำสั่ง torch.cuda.is_available() เพื่อเช็คการทำงาน cuda หากขึ้น Ture ถือว่าใช้ได้ หาก false ให้ทำตามข้อ 7
+7.uninstall torch ด้วยคำสั่ง pip3 uninstall torch torchvision torchaudio
+8.reinstall ตัวของ torch ด้วยคำสั่ง pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+9.ตรวจสอบการติดตั้ง torch torchaudio และ torchvision ด้วยคำสั่ง pip list เพื่อหา 3 ตัวนั้น
+10.จากนั้นใช้คำสั่ง python
+11.import ultralytics
+12.import torch
+13.import torchvision 
+14.ใช้คำสั่ง torch.cuda.is_available() เพื่อเช็คการทำงาน cuda หากขึ้น Ture ถือว่าใช้ได้
+15.ใช้คำสั่ง torchvision.version.cuda ต้องขึ้นค่าไม่ใช่ error ถือเป็นอันใช้ได้ โดยรันด้วยคำสั่ง python getPosition.py
+16.หาก error ให้ทำการ uninstall torchvision ออกด้วยคำสั่ง pip uninstall torchvision
+17.reinstall torchvision ใหม่ด้วย pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+18.จากนั้นใช้คำสั่ง python
+19.import ultralytics
+20.import torch
+21.import torchvision 
+22.ใช้คำสั่ง torch.cuda.is_available() เพื่อเช็คการทำงาน cuda หากขึ้น Ture ถือว่าใช้ได้
+23.ใช้คำสั่ง torchvision.version.cuda ต้องขึ้นค่าไม่ใช่ error ถือเป็นอันใช้ได้ โดยรันด้วยคำสั่ง python getPosition.py
