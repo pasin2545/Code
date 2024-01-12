@@ -10,7 +10,10 @@ import numpy as np
 import time
 from PIL import Image
 import glob
+import json
 
+
+data_list = []
 image_list = []
 model_path = os.path.join('best.pt')
 VIDEOS_DIR = os.path.join('.', 'videos')
@@ -18,36 +21,20 @@ IMG_DIR = os.path.join('.', 'img')
 video_path = os.path.join('DJI_0300.MP4')
 
 
-img_path = os.path.join('004527.jpg')
+img_path = os.path.join('006783.jpg')
 model = YOLO(model_path)
 cap = cv2.VideoCapture(img_path)
 
-prev_frame_time = 0
-new_frame_time = 0
-
-mouse_x, mouse_y = 0, 0
-mouse_clicked = False
-# Callback function for mouse events
-def mouse_callback(event, x, y, flags, param):
-    if event == cv2.EVENT_MOUSEMOVE:
-        # Store the mouse position in global variables
-        global mouse_x, mouse_y
-        mouse_x, mouse_y = x, y
-        print(f"Mouse Position (X, Y): ({x}, {y})")
-        global mouse_clicked
-    if event == cv2.EVENT_LBUTTONDOWN:  # Check for left mouse button click
-        mouse_clicked = not mouse_clicked
-
-# Create a separate window for mouse position
-cv2.namedWindow('Pigeon Detection')
-cv2.setMouseCallback('Pigeon Detection', mouse_callback)
-
-# output_file = 'output_video.mp4'
-# fourcc = cv2.VideoWriter_fourcc(*'mp4v')   
-# fps_out = 30.0 
-# frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-# frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-# out = cv2.VideoWriter(output_file, fourcc, 30, (frame_width,frame_height))
+# def write_json(new_data, filename):
+#     with open(filename,'r+') as file:
+#           # First we load existing data into a dict.
+#         file_data = json.load(file)
+#         # Join new_data with file_data inside emp_details
+#         file_data["Defect"].append(new_data)
+#         # Sets file's current position at offset.
+#         file.seek(0)
+#         # convert back to json.
+#         json.dump(file_data, file, indent = 5)
 
 start = False
 while True:
@@ -90,8 +77,8 @@ while True:
             Heighth = float(d[3])
 
             f = box.xywhn[0]
-            Tophn = float(f[0])
-            Lefthn = float(f[1])
+            Xn = float(f[0])
+            Yn = float(f[1])
             Weighthn = float(f[2])
             Heighthn = float(f[3])
 
@@ -110,8 +97,7 @@ while True:
             box_position_text2 = f"{Bottom,Right}" #br
             box_position_text3 = f"{Top+w,Left}" #tr
             box_position_text4 = f"{Bottom-w,Right}" #bl
-            print(f"{model.names[int(c)]},Top-Left: {(Toph,Lefth)}, Weight-Height: {(Weighth,Heighth)}")
-            print(f"{model.names[int(c)]},Topn-Leftn: {(Tophn,Lefthn)}, Weightn-Heightn: {(Weighthn,Heighthn)}")
+            print(f"{model.names[int(c)]},Xn-Yn: {(Xn,Yn)}, Weightn-Heightn: {(Weighthn,Heighthn)}")
             print(f"{model.names[int(c)]},Class: {(clazz)}")
             
             
@@ -120,46 +106,41 @@ while True:
             cv2.putText(img, box_position_text3, ((Top+w)+1, Left+3), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 255), 1)
             cv2.putText(img, box_position_text4, ((Bottom-w)-70, Right-3), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 255), 1)
              
+            dictionary = {
+                 "Class": clazz,
+                 "X": Xn,
+                 "Y": Yn,
+                 "W": Weighthn,
+                 "H": Heighthn
+            }
+
+            data_list.append(dictionary)
+
+            # if type(out_file) is dict:
+            #     data = [out_file]
+
+            # out_file.append({
+            #      "Class": clazz,
+            #      "X": Xn,
+            #      "Y": Yn,
+            #      "W": Weighthn,
+            #      "H": Heighthn
+            #  })
+
+            # out_file.close()
+
+            
+
+            # write_json(dictionary, file_name) 
+
+
+    with open('number.json', 'w') as out_file:
+        json.dump(data_list,out_file, indent=5)
 
     img = annotator.result()
 
-    
-    # Draw a circle at the mouse position
-    # if 'mouse_x' in globals() and 'mouse_y' in globals():
-    #     cv2.circle(img, (mouse_x, mouse_y), 1, (0, 0, 255), -1)
-    
-    #cv2.imshow('Pigeon Detection', img)
-    mouse_position_text = f"Mouse Position (X, Y): ({mouse_x}, {mouse_y})"
-    cv2.putText(img, mouse_position_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+    data_list.clear()
 
-
-
-    new_frame_time = time.time()
-    fps = 1/(new_frame_time-prev_frame_time) 
-    prev_frame_time = new_frame_time
-     # converting the fps into integer 
-    fps = int(fps) 
-  
-    # converting the fps to string so that we can display it on frame 
-    # by using putText function 
-    fps_list = []
-    fps = int(fps)
-    fps_list.append(fps)
-    average_fps = sum(fps_list) / len(fps_list)
-    FPS_text = f"FPS: {average_fps}" 
-    
-    
-    cv2.putText(img, FPS_text, (18, 330), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-
-    cv2.imshow('Pigeon Detection', img)  # Show mouse position window
-    if cv2.waitKey(1) & 0xFF == ord(' '):
-        break
-    # out.write(img)
-    if start == False:
-         time.sleep(1)
-         start = True
-   
-# out.release() 
 cap.release()
 
 cv2.destroyAllWindows()
