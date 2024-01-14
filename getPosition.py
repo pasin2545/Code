@@ -15,6 +15,8 @@ import json
 
 data_list = []
 image_list = []
+class_list = [0]*9
+sum_defect = 0
 model_path = os.path.join('best.pt')
 VIDEOS_DIR = os.path.join('.', 'videos')
 IMG_DIR = os.path.join('.', 'img')
@@ -43,16 +45,7 @@ while True:
     if not ret: 
         break
     
-    # if mouse_clicked :
-    #     print("click")
-    #     while mouse_clicked :
-    #         if cv2.waitKey(1) & 0xFF == ord(' '):
-    #             break
-    
-    
     results = model.predict(img)
-    
-    
 
     for r in results:
         annotator = Annotator(img,font_size=0.1)
@@ -87,7 +80,10 @@ while True:
 
             c = box.cls
             #annotator.box_label(b)
+
+            class_list[clazz] = class_list[clazz] + 1
             
+            sum_defect+=1
 
             annotator.box_label(b, model.names[int(c)])
             
@@ -133,9 +129,22 @@ while True:
 
             # write_json(dictionary, file_name) 
 
+    defect_sum = {
+        "AllDefect" : sum_defect,
+        "0" : class_list[0],
+        "1" : class_list[1],
+        "2" : class_list[2],
+        "3" : class_list[3],
+        "4" : class_list[4],
+        "5" : class_list[5],
+        "6" : class_list[6],
+        "7" : class_list[7],
+        "8" :class_list[8]
+    }
+    data_list.append(defect_sum)
 
     with open('number.json', 'w') as out_file:
-        json.dump(data_list,out_file, indent=5)
+        json.dump(data_list,out_file, indent=9)
 
     img = annotator.result()
 
